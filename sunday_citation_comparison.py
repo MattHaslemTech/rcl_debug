@@ -25,6 +25,8 @@ if prod_table:
             citation = inner_tds[0].text
             book = inner_tds[1]
             book_title = book.text.replace("--", "-")
+            book_title = book_title.replace("Thanksgiving Day, USA", "Thanksgiving Day")
+            book_title = book_title.strip()
 
             # Check if the book has a link
             temp_link = book.find_all('a')
@@ -47,7 +49,8 @@ else:
 
 
 # URL = "http://localhost/rcl/sunday-citations/"
-URL = "https://rclstaging.233analytics.com/sunday-citations/"
+URL = "http://localhost/rcl/sunday-citation-test/"
+# URL = "https://rclstaging.233analytics.com/sunday-citations/"
 page = requests.get(URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
@@ -69,6 +72,8 @@ if dev_table:
             citation = inner_tds[0].text
             book = inner_tds[1]
             book_title = book.text.replace("--", "-")
+            book_title = book_title.replace("Thanksgiving Day, USA", "Thanksgiving Day")
+            book_title = book_title.strip()
             # book_title = re.sub(r'\n', '', book_title)
 
             # print("citation => " + citation)
@@ -122,7 +127,7 @@ for prod_citation, prod_result in prod_res.items():
 
 
 print("============== WRONG BOOKS ===============")
-csv_file = "C:/Users/MattHaslem/Desktop/233_Analytics/projects/rcl/temp/problems/sunday_12_1_2023.csv"
+csv_file = "C:/Users/MattHaslem/Desktop/233_Analytics/projects/rcl/temp/problems/sunday_plugin_2_26_2024_1.csv"
 issues = {}
 with open(csv_file, mode='w', newline='') as file:
     writer = csv.writer(file)

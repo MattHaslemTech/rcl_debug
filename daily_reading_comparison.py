@@ -4,8 +4,17 @@ from bs4 import BeautifulSoup
 import re
 import csv
 
-# Year A
-URL = "https://rclstaging.233analytics.com/daily-readings/?y=17134"
+# NEW Year A STAGING
+# URL = "https://rclstaging.233analytics.com/daily-readings/?y=17134"
+# Old Year A DEV daily-readings
+# URL = "http://localhost/rcl/daily-readings/?y=372"
+# YEAR B STAGING
+# URL = "https://rclstaging.233analytics.com/daily-readings/?y=382"
+# NEW Year B LOCAL (NOT TEST)
+URL = "http://localhost/rcl/daily-readings/?y=5044"
+# Year C STAGING
+# URL = "https://rclstaging.233analytics.com/daily-readings/?y=384"
+
 page = requests.get(URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
@@ -46,20 +55,32 @@ if readings_sections:
                 # print("verse => " + verse_string)
 
                 temp_res = {
+                    'date_string': date_string,
                     'liturgical_day': liturgical_day,
                     'verse_string': verse_string,
                     'is_sunday': is_sunday,
                     'sorted_verses': ''.join(sorted(re.sub(r'[^a-zA-Z0-9]', '', verse_string)))
                 }
 
-                prod_res[date_string] = temp_res
+                index_string = date_string + "-" + liturgical_day;
+                prod_res[index_string] = temp_res
+                # prod_res[date_string] = temp_res
 
 
 else:
     print("Table with class 'index' not found")
 
 # local new Year A
-URL = "http://localhost/rcl/daily-readings/?y=4928"
+# URL = "http://localhost/rcl/daily-readings/?y=4928"
+# local old Year A
+# URL = "http://localhost/rcl/daily-readings-test/?y=372"
+# local Year B
+# URL = "http://localhost/rcl/daily-readings-test/?y=382"
+# New Year B
+URL = "http://localhost/rcl/daily-readings-test/?y=5044"
+# Local Year C
+# URL = "http://localhost/rcl/daily-readings-test/?y=384"
+
 page = requests.get(URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
@@ -97,78 +118,84 @@ if readings_sections:
                     is_sunday = True
 
                 temp_res = {
+                    'date_string': date_string,
                     'liturgical_day': liturgical_day,
                     'verse_string': verse_string,
                     'is_sunday': is_sunday,
                     'sorted_verses': ''.join(sorted(re.sub(r'[^a-zA-Z0-9]', '', verse_string)))
                 }
 
-                dev_res[date_string] = temp_res
+                index_string = date_string + "-" + liturgical_day;
+                dev_res[index_string] = temp_res
+                # dev_res[date_string] = temp_res
 
 
 else:
     print("Table with class 'index' not found")
 
-print("PROD => ")
-print(prod_res)
+# print("PROD => ")
+# print(prod_res)
+#
+# print("DEV => ")
+# print(dev_res)
 
-print("DEV => ")
-print(dev_res)
+perfect_match_count = 0
+out_of_ordered = 0
+books_are_wrong = 0
 
-#
-# perfect_match_count = 0
-# out_of_ordered = 0
-# books_are_wrong = 0
-#
-# dev_wrong_books = {}
-# prod_wrong_books = {}
-#
-# for prod_citation, prod_result in prod_res.items():
-#
-#     if prod_citation in dev_res:
-#         dev_result = dev_res[prod_citation]
-#
-#         # Check for perfect match
-#         if prod_result == dev_result:
-#             perfect_match_count = perfect_match_count + 1
-#
-#         # Check up if books are all there but out of order
-#         if not prod_result['book_title'] == dev_result['book_title']:
-#             if prod_result['sorted_books'] == dev_result['sorted_books']:
-#                 out_of_ordered = out_of_ordered + 1
-#             else:
-#                 books_are_wrong = books_are_wrong + 1
-#
-#                 dev_wrong_books[dev_result['citation']] = dev_result['book_title']
-#                 prod_wrong_books[prod_result['citation']] = prod_result['book_title']
-#
-#     else:
-#         print(f"citation doesn't exist -> {prod_citation}")
-#
-#
-# print("============== WRONG BOOKS ===============")
-# csv_file = "C:/Users/MattHaslem/Desktop/233_Analytics/projects/rcl/temp/problems/daily_plugin_1_23_2024_9.csv"
-# issues = {}
-# with open(csv_file, mode='w', newline='') as file:
-#     writer = csv.writer(file)
-#     writer.writerow(["citation", "PROD", "DEV"])
-#
-#     for prod_citation, prod_value in prod_wrong_books.items():
-#         print(f"Prod => {prod_citation}")
-#         print(prod_value)
-#         print(f"DEV => {prod_citation}")
-#         print(dev_wrong_books[prod_citation])
-#
-#         temp_issues = [prod_citation, prod_value, dev_wrong_books[prod_citation]]
-#         issues[prod_citation] = temp_issues
-#
-#
-#
-#         writer.writerow([prod_citation, prod_value, dev_wrong_books[prod_citation]])
-# print("=========================================")
-# print(f"Perfect Matches => {perfect_match_count}")
-# print(f"Books out of order => {out_of_ordered}")
-# print(f"Books are wrong => {books_are_wrong}")
-# print("PROD COUNT => " + str(len(prod_res)))
-# print("DEV COUNT => " + str(len(dev_res)))
+dev_wrong_books = {}
+prod_wrong_books = {}
+
+for prod_date, prod_result in prod_res.items():
+
+    if prod_date in dev_res:
+        dev_result = dev_res[prod_date]
+
+        # Check for perfect match
+        if prod_result == dev_result:
+            perfect_match_count = perfect_match_count + 1
+
+        # Check up if books are all there but out of order
+        if not prod_result['verse_string'] == dev_result['verse_string']:
+            if prod_result['sorted_verses'] == dev_result['sorted_verses']:
+                out_of_ordered = out_of_ordered + 1
+            else:
+                books_are_wrong = books_are_wrong + 1
+
+                dev_index_string = dev_result['date_string'] + " - " + dev_result['liturgical_day']
+                dev_wrong_books[dev_index_string] = dev_result['verse_string']
+                # dev_wrong_books[dev_result['date_string']] = dev_result['verse_string']
+                prod_index_string = prod_result['date_string'] + " - " + prod_result['liturgical_day']
+                prod_wrong_books[prod_index_string] = prod_result['verse_string']
+                # prod_wrong_books[prod_result['date_string']] = prod_result['verse_string']
+
+    else:
+        print(f"citation doesn't exist -> {prod_date}")
+
+
+print("============== WRONG VERSES ===============")
+csv_file = "C:/Users/MattHaslem/Desktop/233_Analytics/projects/rcl/temp/problems/daily_readings_B_24.csv"
+issues = {}
+with open(csv_file, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["citation", "PROD", "DEV"])
+
+    for prod_citation, prod_value in prod_wrong_books.items():
+        print(f"Prod => {prod_citation}")
+        print(prod_value)
+        print(f"DEV => {prod_citation}")
+        print(dev_wrong_books[prod_citation])
+
+        temp_issues = [prod_citation, prod_value, dev_wrong_books[prod_citation]]
+        issues[prod_citation] = temp_issues
+
+
+
+        writer.writerow([prod_citation, prod_value, dev_wrong_books[prod_citation]])
+print("=========================================")
+print(f"Perfect Matches => {perfect_match_count}")
+print(f"Verses out of order => {out_of_ordered}")
+print(f"Verses are wrong => {books_are_wrong}")
+print("PROD COUNT => " + str(len(prod_res)))
+print("DEV COUNT => " + str(len(dev_res)))
 

@@ -49,8 +49,8 @@ else:
 
 # URL = "http://localhost/rcl/daily-citations/"
 # URL = "http://localhost/rcl/sunday-citation-test/"
-# URL = "http://localhost/rcl/daily-citation-test/"
-URL = "https://rclstaging.233analytics.com/daily-citations/"
+URL = "http://localhost/rcl/daily-citation-test/"
+# URL = "https://rclstaging.233analytics.com/daily-citations/"
 page = requests.get(URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
@@ -125,7 +125,7 @@ for prod_citation, prod_result in prod_res.items():
 
 
 print("============== WRONG BOOKS ===============")
-csv_file = "C:/Users/MattHaslem/Desktop/233_Analytics/projects/rcl/temp/problems/daily_12_1_2023.csv"
+csv_file = "C:/Users/MattHaslem/Desktop/233_Analytics/projects/rcl/temp/problems/daily_plugin_1_23_2024_9.csv"
 issues = {}
 with open(csv_file, mode='w', newline='') as file:
     writer = csv.writer(file)
