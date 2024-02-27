@@ -2,6 +2,8 @@
 Scripts used to test RCL
 
 # TO RUN
+Modify the line where csv is exported to export to your local machine.
+
 ```
 cd to it
 
